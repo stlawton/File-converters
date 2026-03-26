@@ -2,28 +2,28 @@ import xml.etree.ElementTree as etree
 import json
 import sys
 
-def convert_xml_to_json(csv_file):
+def convert_xml_to_json(xml_file):
     tweets = []
     try:
-        with open(csv_file, newline = '', encoding='utf-8') as f:
 
-            reader = csv.reader(f)
+        tree = etree.parse(xml_file)
+        root = tree.getroot()
             
-            for row in reader:
+        for child in root:
 
-                tweet = {
-                    "Text": row[0],
-                    "ID": int(row[1]),
-                    "QuotedID": int(row[2]),
-                    "RetweetedText": row[3],
-                    "RetweetedHandle": row[4],
-                    "RetweetedName": row[5],
-                    "Retweets": int(row[6]),
-                    "Source": row[7],
-                    "UserHandle": row[8],
-                    "UserName": row[9]
-                }
-                tweets.append(tweet)
+            tweet = {
+                "Text": child.findtext("text"),
+                "ID": int(child.findtext("ID", 0),
+                "QuotedID": int(child.findtext("QuotedID", 0)),
+                "RetweetedText": child.findtext("RetweetedText"),
+                "RetweetedHandle": child.findtext("RetweetedHandle"),
+                "RetweetedName": child.findtext("RetweetedName"),
+                "Retweets": int(child.findtext("Retweets", 0)),
+                "Source": child.findtext("Source"),
+                "UserHandle": child.findtext("UserHandle"),
+                "UserName": child.findtext("UserName")
+            }
+            tweets.append(tweet)
         
         output = {"Tweets": tweets}
         json_out = json.dumps(output, ensure_ascii=False, separators=(',', ':'))
